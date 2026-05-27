@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>⚡ FitTrack</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#0a0f1e;color:#f1f5f9;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+#root{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative}
+button{cursor:pointer;font-family:inherit}
+input,select{font-family:inherit}
+input[type=number]::-webkit-inner-spin-button{opacity:.6}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#0f172a}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+.screen{padding:16px;padding-bottom:90px}
+.screen-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.screen-title{font-size:22px;font-weight:700}
+.card{background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:16px;margin-bottom:14px}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px;font-weight:600;color:#94a3b8}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-card{background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.row{background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.summary-box{background:#0d2137;border:1px solid #1e3a5f;border-radius:10px;padding:10px 14px;font-size:13px;color:#94a3b8;margin-top:4px}
+.tab-btn{padding:8px 14px;background:#1e293b;border:none;border-radius:20px;color:#64748b;cursor:pointer;font-size:13px;white-space:nowrap;transition:all .2s}
+.tab-btn.active{background:#3b82f6;color:#fff;font-weight:600}
+.input-field{width:100%;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:10px 14px;color:#f1f5f9;font-size:14px;outline:none}
+.input-field:focus{border-color:#3b82f6}
+.label{display:block;font-size:12px;color:#64748b;margin-bottom:6px}
+.grad-btn{width:100%;background:linear-gradient(90deg,#3b82f6,#a855f7);border:none;border-radius:12px;padding:14px;color:#fff;font-weight:700;font-size:16px;cursor:pointer;margin-top:8px}
+.add-btn{background:linear-gradient(90deg,#3b82f6,#a855f7);border:none;border-radius:10px;padding:8px 16px;color:#fff;font-weight:600;cursor:pointer;font-size:14px}
+.add-small{background:#1e3a5f;border:1px solid #3b82f6;border-radius:8px;padding:5px 10px;color:#3b82f6;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap}
+.back-btn{background:#1e293b;border:none;border-radius:8px;padding:6px 14px;color:#94a3b8;cursor:pointer;font-size:13px}
+.remove-btn{background:transparent;border:none;color:#ef4444;cursor:pointer;font-size:16px;padding:4px 8px}
+.mini-input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px 12px;color:#f1f5f9;font-size:13px;outline:none}
+.mini-btn{background:#3b82f6;border:none;border-radius:8px;padding:8px 14px;color:#fff;font-weight:600;cursor:pointer;font-size:13px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:flex-end;justify-content:center;z-index:200}
+.modal{background:#0f172a;border:1px solid #1e293b;border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.close-btn{background:#1e293b;border:none;border-radius:8px;width:32px;height:32px;color:#94a3b8;cursor:pointer;font-size:16px}
+.nav-header{background:#0f172a;border-bottom:1px solid #1e293b;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#0f172a;border-top:1px solid #1e293b;display:flex;z-index:100}
+.nav-btn{flex:1;background:transparent;border:none;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:#334155;transition:color .2s}
+.nav-btn.active{color:#3b82f6}
+.nav-btn span:first-child{font-size:20px}
+.nav-btn span:last-child{font-size:9px;font-weight:600}
+.empty{text-align:center;color:#334155;padding:30px;font-size:14px}
+.note{color:#64748b;font-size:13px;margin-bottom:10px}
+.form-group{margin-bottom:14px}
+.tabs-row{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px}
+.tabs-row::-webkit-scrollbar{height:0}
+.grad-text{background:linear-gradient(90deg,#3b82f6,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hidden{display:none!important}
+.tag{border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:1px}
+.pill{background:#1e293b;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600}
+select.input-field option{background:#0f172a}
+.ring-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.progress-bar{height:4px;background:#1e293b;border-radius:2px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:2px;transition:width .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.screen>*{animation:fadeIn .2s ease}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// ─── Constants ───────────────────────────────────────────────────────────────
+const EXERCISE_DB = {
+  "Weight Loss": [
+    { name:"Burpees",           type:"Cardio",     sets:3,    reps:15,   duration:null, calories:80  },
+    { name:"Jump Rope",         type:"Cardio",     sets:null, reps:null, duration:20,   calories:200 },
+    { name:"Mountain Climbers", type:"Cardio",     sets:3,    reps:20,   duration:null, calories:60  },
+    { name:"High Knees",        type:"Cardio",     sets:3,    reps:30,   duration:null, calories:50  },
+    { name:"Box Jumps",         type:"Plyometric", sets:4,    reps:10,   duration:null, calories:70  },
+    { name:"Cycling",           type:"Cardio",     sets:null, reps:null, duration:30,   calories:300 },
+  ],
+  "Muscle Gain": [
+    { name:"Bench Press",    type:"Chest",     sets:4, reps:8,  duration:null, calories:40 },
+    { name:"Deadlifts",      type:"Back",      sets:4, reps:6,  duration:null, calories:60 },
+    { name:"Squats",         type:"Legs",      sets:4, reps:8,  duration:null, calories:50 },
+    { name:"Pull-ups",       type:"Back",      sets:3, reps:10, duration:null, calories:35 },
+    { name:"Overhead Press", type:"Shoulders", sets:4, reps:8,  duration:null, calories:40 },
+    { name:"Barbell Rows",   type:"Back",      sets:4, reps:8,  duration:null, calories:45 },
+  ],
+  "Maintenance": [
+    { name:"Push-ups",       type:"Chest",       sets:3,    reps:15,   duration:null, calories:30  },
+    { name:"Jogging",        type:"Cardio",      sets:null, reps:null, duration:25,   calories:250 },
+    { name:"Plank",          type:"Core",        sets:3,    reps:null, duration:1,    calories:10  },
+    { name:"Lunges",         type:"Legs",        sets:3,    reps:12,   duration:null, calories:35  },
+    { name:"Dumbbell Curls", type:"Arms",        sets:3,    reps:12,   duration:null, calories:25  },
+    { name:"Yoga Flow",      type:"Flexibility", sets:null, reps:null, duration:30,   calories:100 },
+  ],
+};
+
+const COMMON_FOODS = [
+  { name:"Oats (100g)",           calories:389, protein:17, carbs:66, fat:7  },
+  { name:"Chicken Breast (150g)", calories:248, protein:46, carbs:0,  fat:5  },
+  { name:"Brown Rice (100g)",     calories:216, protein:5,  carbs:45, fat:2  },
+  { name:"Egg (1 whole)",         calories:78,  protein:6,  carbs:1,  fat:5  },
+  { name:"Banana",                calories:89,  protein:1,  carbs:23, fat:0  },
+  { name:"Greek Yogurt (150g)",   calories:130, protein:18, carbs:7,  fat:4  },
+  { name:"Almonds (30g)",         calories:173, protein:6,  carbs:6,  fat:15 },
+  { name:"Salmon (150g)",         calories:280, protein:39, carbs:0,  fat:13 },
+  { name:"Sweet Potato (150g)",   calories:129, protein:3,  carbs:30, fat:0  },
+  { name:"Whey Protein Shake",    calories:120, protein:25, carbs:3,  fat:2  },
+  { name:"Broccoli (100g)",       calories:55,  protein:4,  carbs:11, fat:1  },
+  { name:"Whole Milk (200ml)",    calories:122, protein:6,  carbs:9,  fat:7  },
+];
+
+const BODY_ANALYSIS_DB = {
+  lean: {
+    belly: { problemAreas:["Lower belly definition lacking","Mild visceral fat accumulation","Core stability imbalance detected"],
+      suggestedExercises:["Hanging Leg Raises — 3×15","Ab Wheel Rollouts — 3×12","Dragon Flags — 3×8","Vacuum Breathing — 5×30s","Cable Crunches — 4×15"],
+      dietAdvice:["Maintain calorie surplus of 200–300 kcal for lean bulk","Prioritize 1.8g protein per kg bodyweight","Consume slow-digesting carbs post-workout","Avoid alcohol — disrupts cortisol balance"],
+      workoutPlan:[{day:"Mon",focus:"Core + Cardio",exercises:"Ab Wheel ×3, Plank 60s ×4, 20min LISS"},{day:"Wed",focus:"Full Body + Core",exercises:"Deadlifts 4×6, Dragon Flags 3×8, Leg Raises 3×15"},{day:"Fri",focus:"Core Finisher",exercises:"Cable Crunches 4×15, Vacuum Breathing 5×30s, 15min HIIT"},{day:"Sun",focus:"Active Recovery",exercises:"Yoga 30min, Light stretching, Foam roll"}] },
+    arms: { problemAreas:["Tricep development lagging behind biceps","Forearm strength deficit","Shoulder-to-arm ratio imbalance"],
+      suggestedExercises:["Close-Grip Bench Press — 4×8","Skull Crushers — 3×12","Hammer Curls — 4×10","Wrist Roller — 3×60s","Overhead Tricep Extension — 3×12"],
+      dietAdvice:["Increase protein to 2g/kg for muscle synthesis","Add creatine monohydrate 5g daily","Pre-workout: 30g fast carbs + 20g protein","Consider casein protein before bed"],
+      workoutPlan:[{day:"Mon",focus:"Biceps",exercises:"Barbell Curl 4×10, Hammer Curl 4×10, Concentration Curl 3×12"},{day:"Thu",focus:"Triceps",exercises:"Close-Grip Bench 4×8, Skull Crushers 3×12, Pushdowns 3×15"},{day:"Sat",focus:"Arms + Forearms",exercises:"Superset Bi/Tri ×4, Wrist Roller 3×60s"}] },
+    chest: { problemAreas:["Upper chest underdeveloped","Minor pec asymmetry","Chest-shoulder separation needs work"],
+      suggestedExercises:["Incline Dumbbell Press — 4×10","Cable Flyes — 3×15","Dips — 4×12","Decline Push-ups — 3×20","Pec Deck Machine — 3×15"],
+      dietAdvice:["Eat 300 kcal surplus on training days","High leucine foods: eggs, chicken, cottage cheese","Creatine + beta-alanine pre-workout stack","Consume protein within 30min post-workout"],
+      workoutPlan:[{day:"Mon",focus:"Upper Chest",exercises:"Incline Press 4×10, Incline Flyes 3×12, Cable Crossover 3×15"},{day:"Thu",focus:"Full Chest",exercises:"Flat Bench 4×8, Dips 4×12, Pec Deck 3×15"},{day:"Sat",focus:"Chest + Shoulders",exercises:"Push-up Variations 4×15, Cable Flyes 3×15, OHP 4×8"}] },
+    legs: { problemAreas:["Quad-hamstring imbalance detected","Glute activation deficit","Calf development below average"],
+      suggestedExercises:["Bulgarian Split Squats — 4×10 each","Romanian Deadlifts — 4×10","Leg Press — 4×12","Standing Calf Raises — 5×20","Hip Thrusts — 4×12"],
+      dietAdvice:["High-carb days on leg training days (300g+)","BCAAs during training to reduce muscle breakdown","Electrolytes post-workout: sodium, potassium, magnesium","Increase overall caloric intake by 15%"],
+      workoutPlan:[{day:"Tue",focus:"Quads + Calves",exercises:"Squats 5×5, Leg Press 4×12, Calf Raises 5×20"},{day:"Fri",focus:"Hamstrings + Glutes",exercises:"RDL 4×10, Hip Thrusts 4×12, Split Squats 3×10"},{day:"Sun",focus:"Leg Recovery",exercises:"Light cycling 20min, Hip flexor stretches, Foam roll"}] },
+  },
+  average: {
+    belly: { problemAreas:["Moderate abdominal fat accumulation","Weakened transverse abdominis","Elevated cortisol pattern likely"],
+      suggestedExercises:["Plank Variations — 3×45s","Mountain Climbers — 3×30","Bicycle Crunches — 3×20","Russian Twists — 3×20","Walking/Jogging — 30min daily"],
+      dietAdvice:["Reduce processed sugar to under 25g/day","Enter 300–500 kcal daily deficit","Eat high-fiber foods: oats, beans, vegetables","Cut liquid calories completely"],
+      workoutPlan:[{day:"Mon",focus:"Core + Cardio",exercises:"Plank 3×45s, Mountain Climbers 3×30, 30min walk"},{day:"Wed",focus:"Full Body Fat Burn",exercises:"Burpees 3×15, Squat Jumps 3×15, Push-ups 3×15"},{day:"Fri",focus:"Cardio + Core",exercises:"30min jog, Russian Twists 3×20, Bicycle Crunches 3×20"},{day:"Sat",focus:"HIIT Session",exercises:"20min HIIT: 40s on / 20s off, 8 exercises"}] },
+    arms: { problemAreas:["Excess subcutaneous arm fat","Low muscle-to-fat ratio in upper arms","Underactive tricep muscle group"],
+      suggestedExercises:["Dumbbell Curls — 3×12","Tricep Dips — 3×15","Push-ups — 3×15","Overhead Press — 3×10","Band Pull-Aparts — 3×20"],
+      dietAdvice:["Create 400 kcal daily deficit","Increase protein to 1.6g/kg","Avoid refined carbs","Total fat loss reveals arms — no spot reduction"],
+      workoutPlan:[{day:"Mon",focus:"Upper Body",exercises:"Push-ups 3×15, DB Curls 3×12, OHP 3×10"},{day:"Wed",focus:"Cardio + Arms",exercises:"20min cardio, Tricep Dips 3×15, Band Curls 3×15"},{day:"Fri",focus:"Strength",exercises:"Bench Press 3×10, Skull Crushers 3×12, Circuit finisher"}] },
+    chest: { problemAreas:["Fat deposition in chest area","Low pectoral strength baseline","Poor chest-to-shoulder width ratio"],
+      suggestedExercises:["Push-ups — 4×15","Dumbbell Flyes — 3×12","Incline Press — 3×10","Cable Crossovers — 3×15","30min cardio 3×/week"],
+      dietAdvice:["Cruciferous vegetables + zinc-rich foods daily","Caloric deficit of 400–500 kcal/day","Increase Vitamin D, Zinc, Magnesium","Cut alcohol for first 8 weeks"],
+      workoutPlan:[{day:"Mon",focus:"Chest + Cardio",exercises:"Push-ups 4×15, DB Flyes 3×12, 25min jog"},{day:"Thu",focus:"Chest Strength",exercises:"Incline Press 3×10, Cable Crossover 3×15, Dips 3×12"},{day:"Sat",focus:"Full Upper Body",exercises:"Bench Press 3×10, Rows 3×10, Shoulder Press 3×10"}] },
+    legs: { problemAreas:["Excess thigh and hip fat","Weak posterior chain","Knee stability concerns detected"],
+      suggestedExercises:["Bodyweight Squats — 4×20","Glute Bridges — 4×15","Step-ups — 3×12 each","Wall Sit — 3×45s","Walking Lunges — 3×15"],
+      dietAdvice:["Caloric deficit 400–500 kcal","Protein 1.6g/kg","High potassium: banana, sweet potato","Anti-inflammatory: turmeric, omega-3"],
+      workoutPlan:[{day:"Tue",focus:"Lower Body",exercises:"Squats 4×20, Lunges 3×15, Step-ups 3×12, Wall Sit 3×45s"},{day:"Thu",focus:"Glutes + Hamstrings",exercises:"Glute Bridge 4×15, Deadlift 3×10, Calf Raises 4×20"},{day:"Sat",focus:"Legs + Cardio",exercises:"Cycling 25min, Squats 3×15, Hip Abduction 3×20"}] },
+  },
+  overweight: {
+    belly: { problemAreas:["High visceral fat — metabolic risk elevated","Abdominal obesity pattern","Insulin sensitivity reduction likely"],
+      suggestedExercises:["Brisk Walking — 45min daily","Swimming — 30min 3×/week","Standing Oblique Crunches — 3×15","Seated Twists — 3×20"],
+      dietAdvice:["500–700 kcal daily deficit","Focus on whole foods: vegetables, lean protein, legumes","Eliminate ultra-processed foods completely","No sugary drinks — water + herbal tea only"],
+      workoutPlan:[{day:"Mon",focus:"Low-Impact Cardio",exercises:"45min brisk walk, Standing crunches 3×15"},{day:"Wed",focus:"Full Body",exercises:"Chair squats 3×15, Wall push-ups 3×12, March 20min"},{day:"Fri",focus:"Cardio + Flex",exercises:"30min cycling, Stretching 15min, Seated twists 3×20"},{day:"Sun",focus:"Active Rest",exercises:"Light walk 30min, Breathing exercises, Gentle yoga"}] },
+    arms: { problemAreas:["Significant subcutaneous fat in upper arms","Very low muscle activation in triceps","Circulatory issues may affect tone"],
+      suggestedExercises:["Wall Push-ups — 3×15","Seated DB Curls — 3×12 (light)","Chair Dips — 3×10","Band Pulls — 3×15","Arm Swings — 3×30s"],
+      dietAdvice:["500–700 kcal deficit preserving protein","1.4g protein/kg — prevents muscle loss","Supplement B12, D3, Omega-3","Eat 4–5 smaller meals to regulate blood sugar"],
+      workoutPlan:[{day:"Mon",focus:"Arm Activation",exercises:"Wall Push-ups 3×15, Band Curls 3×15, Arm circles 3×30s"},{day:"Wed",focus:"Upper Body",exercises:"Seated DB Curl 3×12, OHP light 3×10, Chair Dips 3×10"},{day:"Sat",focus:"Full + Arms",exercises:"30min walk, Band pulls 3×15, Tricep ext 3×12"}] },
+    chest: { problemAreas:["Significant chest fat accumulation","Structural posture strain","High cardiovascular load — low intensity advised"],
+      suggestedExercises:["Incline Wall Push-ups — 3×12","Band Chest Press — 3×12","Deep Breathing — 5min","Swimming Freestyle — 20min"],
+      dietAdvice:["Balanced macros: 40% carbs, 30% protein, 30% fat","Anti-inflammatory: olive oil, berries, greens","Eliminate trans fats completely","Portion control using hand-size method"],
+      workoutPlan:[{day:"Mon",focus:"Chest + Breathing",exercises:"Incline wall push-ups 3×12, Deep breathing 5min, 20min walk"},{day:"Thu",focus:"Band Work",exercises:"Band chest press 3×12, Seated flyes 3×12, Light cardio 20min"},{day:"Sat",focus:"Cardio + Core",exercises:"Swimming 20min, Seated crunches 3×15"}] },
+    legs: { problemAreas:["High adipose tissue in thighs and hips","Joint stress from excess weight","Reduced ankle mobility"],
+      suggestedExercises:["Chair Squats — 3×15","Seated Leg Extensions — 3×12","Ankle Rotations — 3×20","Step Marching — 3×30s","Pool Walking — 20min"],
+      dietAdvice:["Anti-inflammatory diet to reduce joint pressure","Glucosamine + Chondroitin for joint support","Prioritize weight loss before heavy leg training","Low-sodium to reduce water retention"],
+      workoutPlan:[{day:"Tue",focus:"Gentle Legs",exercises:"Chair squats 3×15, Ankle rotations 3×20, Step marching 3×30s"},{day:"Thu",focus:"Low-Impact",exercises:"Leg press light 3×12, Leg raises seated 3×15, Walk 20min"},{day:"Sat",focus:"Legs + Cardio",exercises:"Pool walking 20min, Calf raises 4×15, Glute bridges 3×12"}] },
+  },
+};
+
+const NAV_ITEMS = [
+  { id:"dashboard", icon:"📊", label:"Home" },
+  { id:"workout",   icon:"🏋️", label:"Workout" },
+  { id:"nutrition", icon:"🍎", label:"Nutrition" },
+  { id:"weight",    icon:"⚖️", label:"Weight" },
+  { id:"body",      icon:"🧬", label:"Body AI" },
+  { id:"reminders", icon:"🔔", label:"Reminders" },
+];
+
+const MEAL_TYPES = ["Breakfast","Lunch","Dinner","Snack"];
+const FITNESS_GOALS = ["Weight Loss","Muscle Gain","Maintenance"];
+const DAY_ORDER = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+// ─── Data helpers ─────────────────────────────────────────────────────────────
+const todayStr = () => new Date().toISOString().split("T")[0];
+const formatDate = (iso, opts = {month:"short",day:"numeric"}) =>
+  new Date(iso + "T00:00:00").toLocaleDateString("en-US", opts);
+
+function calcBMI(weightKg, heightCm) {
+  const v = weightKg / ((heightCm / 100) ** 2);
+  return { value: +v.toFixed(1), label: v < 18.5 ? "Underweight" : v < 25 ? "Normal" : v < 30 ? "Overweight" : "Obese" };
+}
+
+function calcStreak(workouts) {
+  let s = 0; const d = new Date();
+  for (let i = 0; i < 30; i++) {
+    const k = d.toISOString().split("T")[0];
+    if (workouts.some(w => w.date === k)) s++;
+    else if (i > 0) break;
+    d.setDate(d.getDate() - 1);
+  }
+  return s;
+}
+
+const sumField = (arr, field) => arr.reduce((s, x) => s + (x[field] || 0), 0);
+
+// ─── Storage ──────────────────────────────────────────────────────────────────
+const DS = {
+  load: (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } },
+  save: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+
+// ─── State ────────────────────────────────────────────────────────────────────
+const DEFAULT_REMINDERS = [
+  { id:1, label:"Morning Workout",   time:"07:00", enabled:true,  icon:"🏋️", days:["Mon","Wed","Fri"] },
+  { id:2, label:"Log Breakfast",     time:"08:30", enabled:true,  icon:"🍳", days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] },
+  { id:3, label:"Drink Water",       time:"10:00", enabled:false, icon:"💧", days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] },
+  { id:4, label:"Log Lunch",         time:"13:00", enabled:true,  icon:"🍽️", days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] },
+  { id:5, label:"Afternoon Workout", time:"17:00", enabled:false, icon:"🔥", days:["Tue","Thu","Sat"] },
+  { id:6, label:"Log Dinner",        time:"19:30", enabled:true,  icon:"🥗", days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] },
+  { id:7, label:"Evening Walk",      time:"20:00", enabled:false, icon:"🚶", days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] },
+  { id:8, label:"Sleep Reminder",    time:"22:30", enabled:false, icon:"😴", days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] },
+];
+
+let APP = {
+  authed:      DS.load("ft_authed", false),
+  profile:     DS.load("ft_profile", { name:"Athlete", email:"", age:25, weight:75, height:175, goal:"Weight Loss", targetWeight:70, targetCalories:2000, targetWorkouts:4 }),
+  workouts:    DS.load("ft_workouts", []),
+  meals:       DS.load("ft_meals", []),
+  weights:     DS.load("ft_weights", []),
+  water:       DS.load("ft_water", {}),
+  steps:       DS.load("ft_steps", {}),
+  favWorkouts: DS.load("ft_favworkouts", []),
+  favMeals:    DS.load("ft_favmeals", []),
+  reminders:   DS.load("ft_reminders", DEFAULT_REMINDERS),
+  screen:      "dashboard",
+};
+
+function save() {
+  DS.save("ft_authed", APP.authed);
+  DS.save("ft_profile", APP.profile);
+  DS.save("ft_workouts", APP.workouts);
+  DS.save("ft_meals", APP.meals);
+  DS.save("ft_weights", APP.weights);
+  DS.save("ft_water", APP.water);
+  DS.save("ft_steps", APP.steps);
+  DS.save("ft_favworkouts", APP.favWorkouts);
+  DS.save("ft_favmeals", APP.favMeals);
+  DS.save("ft_reminders", APP.reminders);
+}
+
+function getDerived() {
+  const key = todayStr();
+  const todayWorkouts = APP.workouts.filter(w => w.date === key);
+  const todayMeals    = APP.meals.filter(m => m.date === key);
+  const todayWater    = APP.water[key] || 0;
+  const todaySteps    = APP.steps[key] || 0;
+  const calIn     = sumField(todayMeals, "calories");
+  const calBurned = sumField(todayWorkouts, "calories");
+  const protein   = sumField(todayMeals, "protein");
+  const carbs     = sumField(todayMeals, "carbs");
+  const fat       = sumField(todayMeals, "fat");
+  const latestWeight = APP.weights.length ? APP.weights[APP.weights.length-1].weight : APP.profile.weight;
+  const { value:bmi, label:bmiLabel } = calcBMI(latestWeight, APP.profile.height);
+  const streak = calcStreak(APP.workouts);
+  const WEEK_LABELS = ["S","M","T","W","T","F","S"];
+  const weeklyData = Array.from({length:7},(_,i)=>{
+    const d=new Date(); d.setDate(d.getDate()-(6-i));
+    const k=d.toISOString().split("T")[0];
+    return { day:WEEK_LABELS[d.getDay()], intake:sumField(APP.meals.filter(m=>m.date===k),"calories"), burned:sumField(APP.workouts.filter(w=>w.date===k),"calories") };
+  });
+  const weightChartData = APP.weights.slice(-14).map(w=>({date:w.date.slice(5),weight:w.weight}));
+  return { todayWorkouts, todayMeals, todayWater, todaySteps, calIn, calBurned, protein, carbs, fat, latestWeight, bmi, bmiLabel, streak, weeklyData, weightChartData };
+}
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
+const actions = {
+  login: (name, email) => { APP.profile = {...APP.profile, name:name||APP.profile.name, email}; APP.authed = true; },
+  logout: () => { APP.authed = false; },
+  updateProfile: (u) => { APP.profile = {...APP.profile, ...u}; },
+  addWorkout:    (ex)      => { APP.workouts = [...APP.workouts, {...ex, id:Date.now(), date:todayStr()}]; },
+  editWorkout:   (id, upd) => { APP.workouts = APP.workouts.map(w=>w.id===id?{...w,...upd}:w); },
+  removeWorkout: (id)      => { APP.workouts = APP.workouts.filter(w=>w.id!==id); },
+  addMeal:    (m)      => { APP.meals = [...APP.meals, {...m, id:Date.now(), date:todayStr()}]; },
+  editMeal:   (id, upd)=> { APP.meals = APP.meals.map(m=>m.id===id?{...m,...upd}:m); },
+  removeMeal: (id)     => { APP.meals = APP.meals.filter(m=>m.id!==id); },
+  addWeight:    (w)       => { APP.weights = [...APP.weights.filter(x=>x.date!==todayStr()), {weight:parseFloat(w), date:todayStr()}]; },
+  editWeight:   (date,nw) => { APP.weights = APP.weights.map(x=>x.date===date?{...x,weight:parseFloat(nw)}:x); },
+  removeWeight: (date)    => { APP.weights = APP.weights.filter(x=>x.date!==date); },
+  addWater: (cups) => { const k=todayStr(); APP.water = {...APP.water, [k]: Math.max(0,(APP.water[k]||0)+cups)}; },
+  addSteps: (n)    => { const k=todayStr(); APP.steps = {...APP.steps, [k]: Math.max(0,(APP.steps[k]||0)+parseInt(n||0))}; },
+  toggleFavWorkout: (ex) => {
+    const e=APP.favWorkouts.find(f=>f.name===ex.name);
+    APP.favWorkouts = e ? APP.favWorkouts.filter(f=>f.name!==ex.name) : [...APP.favWorkouts, {...ex,favId:Date.now()}];
+  },
+  toggleFavMeal: (meal) => {
+    const e=APP.favMeals.find(f=>f.name===meal.name);
+    APP.favMeals = e ? APP.favMeals.filter(f=>f.name!==meal.name) : [...APP.favMeals, {...meal,favId:Date.now()}];
+  },
+  toggleReminder:  (id)     => { APP.reminders = APP.reminders.map(r=>r.id===id?{...r,enabled:!r.enabled}:r); },
+  updateReminder:  (id,upd) => { APP.reminders = APP.reminders.map(r=>r.id===id?{...r,...upd}:r); },
+  addReminder:     (r)      => { APP.reminders = [...APP.reminders, {...r, id:Date.now()}]; },
+  removeReminder:  (id)     => { APP.reminders = APP.reminders.filter(r=>r.id!==id); },
+};
+
+function dispatch(action, ...args) {
+  if (actions[action]) actions[action](...args);
+  save();
+  render();
+}
+
+// ─── AI / Rule Engine ─────────────────────────────────────────────────────────
+function generateBodyAnalysis({ bodyType, problemAreas }) {
+  const db = BODY_ANALYSIS_DB[bodyType] || {};
+  const out = { problems:[], exercises:[], diet:[], plan:[] };
+  const planMap = {};
+  problemAreas.forEach(area => {
+    const d = db[area]; if (!d) return;
+    out.problems.push(...d.problemAreas);
+    out.exercises.push(...d.suggestedExercises);
+    out.diet.push(...d.dietAdvice);
+    d.workoutPlan.forEach(p => { if (!planMap[p.day]) planMap[p.day] = p; });
+  });
+  return {
+    bodyType, problemAreas,
+    problems:  [...new Set(out.problems)],
+    exercises: [...new Set(out.exercises)].slice(0,8),
+    diet:      [...new Set(out.diet)].slice(0,6),
+    plan:      Object.values(planMap).sort((a,b)=>DAY_ORDER.indexOf(a.day)-DAY_ORDER.indexOf(b.day)),
+    score:     bodyType==="lean"?72:bodyType==="average"?54:38,
+    analysisId:`FT-${Date.now().toString(36).toUpperCase()}`,
+  };
+}
+
+// Rule engine for AI coach
+const DEFICIT_PLAN=[{day:"Mon",focus:"Cardio + Core",exercises:"30min HIIT, Plank 3×60s, Mountain Climbers 3×20"},{day:"Tue",focus:"Upper Body",exercises:"Push-ups 4×15, DB Rows 3×12, Shoulder Press 3×10"},{day:"Wed",focus:"Cardio",exercises:"45min brisk walk or jog, Core circuit"},{day:"Thu",focus:"Lower Body",exercises:"Squats 4×12, Lunges 3×12, Glute Bridges 3×15"},{day:"Fri",focus:"HIIT",exercises:"20min HIIT circuit, Jump rope 3×3min"},{day:"Sat",focus:"Active Recovery",exercises:"30min walk, Stretching 15min"},{day:"Sun",focus:"Rest",exercises:"Full rest or light yoga"}];
+const MUSCLE_PLAN=[{day:"Mon",focus:"Chest + Triceps",exercises:"Bench Press 4×8, Incline DB 3×10, Tricep Dips 3×12"},{day:"Tue",focus:"Back + Biceps",exercises:"Deadlifts 4×6, Pull-ups 3×8, DB Curls 4×10"},{day:"Wed",focus:"Rest / Cardio",exercises:"20min light cardio"},{day:"Thu",focus:"Shoulders + Traps",exercises:"OHP 4×8, Lateral Raises 3×15, Shrugs 3×12"},{day:"Fri",focus:"Legs",exercises:"Squats 5×5, Romanian DL 4×8, Calf Raises 5×15"},{day:"Sat",focus:"Arms",exercises:"Barbell Curl 4×10, Skull Crushers 3×12"},{day:"Sun",focus:"Rest",exercises:"Full rest"}];
+const BEGINNER_PLAN=[{day:"Mon",focus:"Full Body A",exercises:"Squats 3×10, Push-ups 3×10, DB Rows 3×10"},{day:"Wed",focus:"Full Body B",exercises:"Deadlifts 3×8, OHP 3×10, Lat Pulldown 3×10"},{day:"Fri",focus:"Full Body C",exercises:"Lunges 3×10, Bench Press 3×10, Face Pulls 3×15"},{day:"Sat",focus:"Light Cardio",exercises:"30min walk or bike"},{day:"Sun",focus:"Rest",exercises:"Full rest"}];
+
+function runRuleEngine({ profile, derived, workouts, meals, weights }) {
+  const { calIn, calBurned, protein, todayWater, todayWorkouts, bmi, streak, latestWeight } = derived;
+  const targetCal = profile.targetCalories || 2000;
+  const proteinTarget = Math.round((latestWeight||75)*1.7);
+  const goal = profile.goal;
+  const issues = [], recommendations = [], nextSteps = [];
+  const last7 = Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-i);return d.toISOString().split("T")[0];});
+  const weeklyWorkoutDays = new Set(workouts.filter(w=>last7.includes(w.date)).map(w=>w.date)).size;
+  const calPct = calIn > 0 ? Math.round((calIn/targetCal)*100) : 0;
+  const proteinPct = protein > 0 ? Math.round((protein/proteinTarget)*100) : 0;
+  const weightTrendDir = weights.length < 2 ? "stable" : weights[weights.length-1].weight < weights[weights.length-2].weight ? "dropping" : weights[weights.length-1].weight > weights[weights.length-2].weight ? "rising" : "stable";
+
+  let summary = "";
+  let score = 50;
+
+  if (weeklyWorkoutDays === 0) {
+    issues.push({ severity:"critical", title:"No workouts logged this week", detail:"Consistency is the #1 driver of fitness results. Even 2–3 sessions per week creates meaningful adaptation.", why:"Zero activity means zero adaptation stimulus." });
+    score -= 20;
+  } else if (weeklyWorkoutDays < (profile.targetWorkouts||4)*0.5) {
+    issues.push({ severity:"warning", title:`Only ${weeklyWorkoutDays} workout(s) this week`, detail:`Your target is ${profile.targetWorkouts} sessions. You're currently at ${weeklyWorkoutDays}.`, why:"Below 50% of target significantly slows progress." });
+    score -= 10;
+  } else { score += 15; }
+
+  if (calIn === 0) {
+    issues.push({ severity:"warning", title:"No meals logged today", detail:"Logging food is the most reliable predictor of hitting nutrition targets.", why:"Unlogged eating makes it impossible to track your deficit or surplus." });
+  } else if (goal==="Weight Loss" && calPct > 115) {
+    issues.push({ severity:"warning", title:`Calorie surplus detected (${calPct}% of target)`, detail:`You're consuming ${calIn-targetCal} kcal above your target. This will slow weight loss.`, why:"A 3500 kcal excess = 0.45kg gained." });
+    score -= 10;
+  } else if (goal==="Muscle Gain" && calPct < 95) {
+    issues.push({ severity:"warning", title:"Calorie deficit during bulk", detail:"Muscle growth requires a slight caloric surplus. You're under target.", why:"Insufficient calories force the body to prioritise survival over muscle building." });
+    score -= 8;
+  } else { score += 10; }
+
+  if (protein > 0 && proteinPct < 60) {
+    issues.push({ severity:"critical", title:`Protein critically low (${proteinPct}% of target)`, detail:`Current: ${protein}g. Target: ${proteinTarget}g. Add high-protein foods to reach your goal.`, why:"Low protein causes muscle loss during deficit and blocks muscle synthesis during bulk." });
+    score -= 15;
+  } else if (protein > 0 && proteinPct >= 80) { score += 10; }
+
+  if (todayWater < 4) {
+    issues.push({ severity:"warning", title:`Low hydration (${todayWater} cups)`, detail:"Aim for 8+ cups daily. Dehydration reduces performance and increases hunger.", why:"Even 2% dehydration impairs cognitive and physical performance." });
+    score -= 5;
+  }
+
+  if (streak >= 5) { score += 10; recommendations.push({ icon:"🏆", category:"Streak", title:`${streak}-day streak`, detail:"You're building a real habit. Consistency compounds.", }); }
+
+  if (weeklyWorkoutDays >= 1) {
+    const ex = EXERCISE_DB[goal] || EXERCISE_DB["Maintenance"];
+    recommendations.push({ icon:"🏋️", category:"Workout", title:"Recommended exercises for your goal", detail:`Based on ${goal}, here are top exercises to include:`, plan: ex.map(e=>({day:e.type, focus:e.name, exercises:`${e.sets?e.sets+"×":""} ${e.reps?e.reps+" reps":""} ${e.duration?"| "+e.duration+"min":""} | ~${e.calories} cal`})) });
+  }
+
+  if (protein < proteinTarget) {
+    const remaining = proteinTarget - protein;
+    recommendations.push({ icon:"🍗", category:"Nutrition", title:`Need ${remaining}g more protein today`, detail:"Top sources to close the gap:", foods:["Chicken Breast 150g = 46g protein","Greek Yogurt 150g = 18g protein","Whey Protein Shake = 25g protein","Eggs (2) = 12g protein","Salmon 150g = 39g protein"] });
+  }
+
+  if (goal==="Weight Loss" && calPct > 100) nextSteps.push({ priority:1, action:"Reduce dinner portion — swap rice/pasta for extra vegetables to cut 200–300 kcal easily." });
+  if (weeklyWorkoutDays < (profile.targetWorkouts||4)) nextSteps.push({ priority:1, action:`Log ${(profile.targetWorkouts||4)-weeklyWorkoutDays} more workout session(s) this week to hit your target.` });
+  if (protein < proteinTarget * 0.8) nextSteps.push({ priority:1, action:`Add a high-protein meal or shake today. Need ${Math.round(proteinTarget - protein)}g more protein.` });
+  nextSteps.push({ priority:2, action:"Log your weight daily (same time, same conditions) for accurate trend tracking." });
+  nextSteps.push({ priority:2, action:"Prep your meals the night before — meal prepped athletes hit protein targets 3× more consistently." });
+
+  score = Math.min(100, Math.max(0, score));
+  const scoreLabel = score>=80?"Excellent":score>=60?"Good":score>=40?"Average":"Needs Work";
+  summary = `Your overall fitness score is ${score}/100 (${scoreLabel}). ${weeklyWorkoutDays} workout day(s) logged this week. ${calIn>0?`Calorie intake at ${calPct}% of target.`:"No meals logged today."} ${protein>0?`Protein at ${proteinPct}% of daily goal.`:""}`;
+
+  let weeklyPlan;
+  if (goal==="Weight Loss") weeklyPlan = DEFICIT_PLAN;
+  else if (goal==="Muscle Gain") weeklyPlan = MUSCLE_PLAN;
+  else weeklyPlan = BEGINNER_PLAN;
+
+  return { summary, score, scoreLabel, issues, recommendations, nextSteps, weeklyPlan, meta: { calPct, proteinPct, weeklyWorkoutDays, weightTrendDir, proteinTarget } };
+}
+
+// ─── UI State (local to screens) ──────────────────────────────────────────────
+let UI = {
+  workoutTab: "today", workoutSearch: "", workoutModal: false, workoutEditId: null, workoutDeleteId: null,
+  workoutForm: { name:"", type:"", sets:3, reps:10, duration:0, calories:50 },
+  nutritionTab: "Breakfast", nutritionSearch: "", nutritionModal: false, nutritionEditId: null, nutritionDeleteId: null,
+  nutritionForm: { name:"", meal:"Breakfast", calories:0, protein:0, carbs:0, fat:0 },
+  weightModal: false, weightEditDate: null, weightInput: "", weightDeleteDate: null,
+  profileForm: null,
+  aiTab: "issues",
+  bodyStep: 0, bodyType: null, bodyAreas: [], bodyResult: null,
+  authMode: "login", authForm: { name:"", email:"", password:"" },
+  reminderModal: false, reminderEditId: null,
+  reminderForm: { label:"", time:"08:00", icon:"🔔", days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] },
+};
+
+// ─── Render engine ────────────────────────────────────────────────────────────
+function render() {
+  const root = document.getElementById("root");
+  if (!APP.authed) { root.innerHTML = renderAuth(); bindAuth(); return; }
+  const derived = getDerived();
+  root.innerHTML = `
+    ${renderHeader(derived)}
+    <div style="flex:1;overflow-y:auto;padding-bottom:80px" id="main-content">
+      ${renderScreen(derived)}
+    </div>
+    ${renderBottomNav()}
+    ${renderModals(derived)}
+  `;
+  bindAll(derived);
+}
+
+// ─── Header ───────────────────────────────────────────────────────────────────
+function renderHeader(derived) {
+  const d = new Date();
+  const dateStr = d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+  return `<div class="nav-header">
+    <div>
+      <div style="font-size:18px;font-weight:800" class="grad-text">⚡ FitTrack</div>
+      <div style="font-size:11px;color:#64748b">${dateStr}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="background:#1e293b;border-radius:20px;padding:4px 10px;font-size:13px;font-weight:600;color:#f59e0b">🔥 ${derived.streak}d</span>
+      <div onclick="dispatch('_nav','profile')" style="width:36px;height:36px;border-radius:18px;background:linear-gradient(90deg,#3b82f6,#a855f7);display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;font-size:16px">
+        ${(APP.profile.name?.[0]||"A").toUpperCase()}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── Bottom Nav ───────────────────────────────────────────────────────────────
+function renderBottomNav() {
+  return `<div class="bottom-nav">
+    ${NAV_ITEMS.map(n=>`<button class="nav-btn${APP.screen===n.id?" active":""}" onclick="dispatch('_nav','${n.id}')">
+      <span>${n.icon}</span><span>${n.label}</span>
+    </button>`).join("")}
+  </div>`;
+}
+
+// ─── Screen Router ────────────────────────────────────────────────────────────
+function renderScreen(derived) {
+  switch (APP.screen) {
+    case "dashboard":  return renderDashboard(derived);
+    case "workout":    return renderWorkout(derived);
+    case "nutrition":  return renderNutrition(derived);
+    case "weight":     return renderWeight(derived);
+    case "body":       return renderBody();
+    case "reminders":  return renderReminders();
+    case "ai":         return renderAI(derived);
+    case "profile":    return renderProfile();
+    default:           return renderDashboard(derived);
+  }
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
+function renderDashboard(d) {
+  const targetCal = APP.profile.targetCalories || 2000;
+  const calPct = Math.min(100, Math.round((d.calIn/targetCal)*100));
+  const proteinTarget = Math.round((d.latestWeight||75)*1.7);
+  const hour = new Date().getHours();
+
+  // Today's recommendation
+  const rec = getTodayRec(d, proteinTarget, targetCal, hour);
+  const urgColors = {positive:"#10b981",warning:"#f59e0b",action:"#3b82f6",motivational:"#a855f7",info:"#64748b"};
+  const urgColor = urgColors[rec.urgency]||"#3b82f6";
+
+  return `<div class="screen">
+    <div class="screen-head"><h2 class="screen-title">👋 Hey, ${APP.profile.name.split(" ")[0]}!</h2>
+      <span style="font-size:13px;color:#64748b">${APP.profile.goal}</span></div>
+
+    <!-- Calorie ring card -->
+    <div class="card" style="background:linear-gradient(135deg,#0f172a,#0a1628)">
+      <div class="card-head">🔥 Today's Calories</div>
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="position:relative;width:90px;height:90px;flex-shrink:0">
+          ${renderRing(calPct,"#3b82f6",90)}
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:18px;font-weight:700">${d.calIn}</div>
+            <div style="font-size:9px;color:#64748b">kcal</div>
+          </div>
+        </div>
+        <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${[["Target",targetCal+" kcal","#3b82f6"],["Burned",d.calBurned+" kcal","#10b981"],["Net",(d.calIn-d.calBurned)+" kcal","#f59e0b"],["Protein",d.protein+"g","#a855f7"]].map(([l,v,c])=>`
+            <div><div style="font-size:14px;font-weight:700;color:${c}">${v}</div><div style="font-size:10px;color:#64748b">${l}</div></div>
+          `).join("")}
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat grid -->
+    <div class="grid4">
+      ${[["💧",d.todayWater,"cups","#3b82f6"],["👣",d.todaySteps.toLocaleString(),"steps","#10b981"],["⚖️",d.latestWeight+"kg","weight","#a855f7"],["🏅",d.streak+"d","streak","#f59e0b"]].map(([ico,val,lbl,c])=>`
+        <div class="stat-card">
+          <span style="font-size:20px">${ico}</span>
+          <span style="font-size:15px;font-weight:700;color:${c}">${val}</span>
+          <span style="font-size:10px;color:#64748b">${lbl}</span>
+        </div>
+      `).join("")}
+    </div>
+
+    <!-- Water & Steps quick add -->
+    <div class="card">
+      <div class="card-head">💧 Water & 👣 Steps</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button class="add-small" onclick="dispatch('addWater',1)">+1 cup</button>
+        <button class="add-small" onclick="dispatch('addWater',2)">+2 cups</button>
+        <button class="add-small" onclick="dispatch('addWater',-1)">-1 cup</button>
+        <div style="flex:1;text-align:right;font-size:13px;color:#3b82f6;font-weight:700">${d.todayWater}/8 cups</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="steps-in" class="mini-input" type="number" placeholder="Add steps…" style="max-width:140px"/>
+        <button class="mini-btn" onclick="addStepsFromInput()">+</button>
+        <div style="flex:1;text-align:right;font-size:13px;color:#10b981;font-weight:700">${d.todaySteps.toLocaleString()} steps</div>
+      </div>
+    </div>
+
+    <!-- Macros -->
+    <div class="card">
+      <div class="card-head">📊 Macros Today</div>
+      <div style="display:flex;gap:12px">
+        ${[["Protein",d.protein,proteinTarget,"g","#3b82f6"],["Carbs",d.carbs,250,"g","#a855f7"],["Fat",d.fat,65,"g","#ef4444"]].map(([l,v,t,u,c])=>`
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:${c}">${v}${u}</div>
+            <div style="font-size:10px;color:#64748b;margin-bottom:4px">${l} / ${t}${u}</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100,Math.round(v/t*100))}%;background:${c}"></div></div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <!-- Today's recommendation -->
+    <div class="card" style="border-left:3px solid ${urgColor}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:24px">${rec.icon}</span>
+        <div>
+          <div style="font-size:10px;color:${urgColor};font-weight:700;letter-spacing:1px;text-transform:uppercase">${rec.category}</div>
+          <div style="font-size:15px;font-weight:700">${rec.title}</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:10px">${rec.body}</div>
+      <div style="font-size:12px;color:#64748b;background:#0a0f1e;border-radius:8px;padding:8px;margin-bottom:10px">💡 ${rec.tip}</div>
+      <button class="add-small" onclick="dispatch('_nav','${rec.ctaScreen}')" style="background:${urgColor}22;border-color:${urgColor};color:${urgColor}">${rec.cta} →</button>
+    </div>
+
+    <!-- Weekly Chart -->
+    <div class="card">
+      <div class="card-head">📈 Weekly Overview</div>
+      ${renderBarChart(d.weeklyData)}
+    </div>
+
+    <!-- BMI -->
+    <div class="card">
+      <div class="card-head">BMI <span style="color:#3b82f6;font-size:12px;font-weight:600">${d.bmi} — ${d.bmiLabel}</span></div>
+      <div style="display:flex;gap:3px;margin-bottom:6px">
+        ${[["#3b82f6","<18.5","Under"],["#10b981","18.5–25","Normal"],["#f59e0b","25–30","Over"],["#ef4444",">30","Obese"]].map(([c,r,l])=>`
+          <div style="flex:1;height:8px;background:${c};border-radius:4px;position:relative" title="${l} (${r})"></div>
+        `).join("")}
+      </div>
+      <div style="position:relative;height:16px">
+        <div style="position:absolute;left:${Math.min(95,Math.max(2,((d.bmi-15)/25)*100))}%;transform:translateX(-50%);font-size:9px;color:#f1f5f9;font-weight:700">${d.bmi}▼</div>
+      </div>
+    </div>
+
+    <!-- Quick nav -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      ${[["🏋️ Log Workout","workout","#3b82f6"],["🍎 Log Meal","nutrition","#10b981"],["🧬 Body Analysis","body","#a855f7"],["🤖 AI Coach","ai","#f59e0b"]].map(([l,s,c])=>`
+        <button onclick="dispatch('_nav','${s}')" style="background:${c}18;border:1px solid ${c}44;border-radius:12px;padding:14px;color:${c};font-weight:600;font-size:14px;cursor:pointer">${l}</button>
+      `).join("")}
+    </div>
+  </div>`;
+}
+
+function getTodayRec(d, proteinTarget, targetCal, hour) {
+  const calPct = d.calIn > 0 ? (d.calIn/targetCal)*100 : 0;
+  const proteinPct = d.protein > 0 ? (d.protein/proteinTarget)*100 : 0;
+  const goal = APP.profile.goal;
+  if (d.streak>=5 && d.todayWorkouts.length>0 && calPct>=85 && calPct<=115) return {icon:"🏆",category:"On Fire",title:"Perfect day in progress!",body:`${d.streak}-day streak, workout done, calories on target. You're executing at elite level. Focus on sleep tonight.`,cta:"View Progress",ctaScreen:"weight",urgency:"positive",tip:"Sleep before midnight increases anabolic hormone output by up to 30%."};
+  if (d.streak===0 && d.todayWorkouts.length===0) return {icon:"💡",category:"Fresh Start",title:"Start your comeback today",body:"Every elite athlete has had a bad week. The difference is they always come back. One workout today rebuilds momentum.",cta:"Pick a Workout",ctaScreen:"workout",urgency:"motivational",tip:`Suggested: ${goal==="Weight Loss"?"20min brisk walk + 10min core":goal==="Muscle Gain"?"Upper body strength — 45min":"30min full-body circuit"}.`};
+  if (d.todayWorkouts.length===0 && hour>=10) return {icon:"🏋️",category:"Workout",title:`Time to train — ${goal} focus`,body:`You haven't trained yet today. A quick session will have the highest impact.`,cta:"Log Workout",ctaScreen:"workout",urgency:"action",tip:goal==="Muscle Gain"?"Train within 90min of your next meal for maximum protein synthesis.":"Fasted or 2hrs post-meal cardio burns 20% more fat."};
+  if (d.calIn===0 && hour>=9) return {icon:"🍳",category:"Nutrition",title:"Fuel your body — log breakfast",body:"Your metabolism is waiting. Eating within 1–2 hours of waking regulates cortisol and sets you up for better food choices all day.",cta:"Log Breakfast",ctaScreen:"nutrition",urgency:"action",tip:"Ideal breakfast: 30–40g protein + complex carbs + healthy fat."};
+  if (d.protein < proteinTarget*0.4 && hour>=13) return {icon:"🍗",category:"Nutrition",title:`Need ${proteinTarget-d.protein}g more protein`,body:`You're at ${Math.round(proteinPct)}% of your protein target. Low protein causes muscle loss.`,cta:"Log Meal",ctaScreen:"nutrition",urgency:"action",tip:"Quick fix: Greek yogurt (18g) + chicken breast (46g) = 64g protein."};
+  if (calPct>110 && goal==="Weight Loss") return {icon:"⚡",category:"Recovery",title:`${Math.round(d.calIn-targetCal)} kcal over — here's your fix`,body:"A 20–30 min brisk walk burns ~200 kcal. Keep dinner light.",cta:"Log Workout",ctaScreen:"workout",urgency:"warning",tip:"A 30min walk after dinner improves sleep quality and blood sugar control."};
+  if (d.todayWater<3 && hour>=12) return {icon:"💧",category:"Hydration",title:"Drink up — performance is dropping",body:`At just ${d.todayWater} cup(s) you're already dehydrated. Even mild dehydration reduces performance by up to 20%.`,cta:"Track Water",ctaScreen:"dashboard",urgency:"warning",tip:"Set an alarm every 90 minutes. Cold water slightly boosts metabolism."};
+  return {icon:"🎯",category:"Today's Focus",title:`Stay consistent with ${goal}`,body:"Consistency over intensity is the secret. Log your meals, hit your workout, drink your water.",cta:"Run AI Analysis",ctaScreen:"ai",urgency:"info",tip:"Users who log daily lose 2× more weight than those who log occasionally."};
+}
+
+function renderRing(pct, color, size=90) {
+  const r = (size-10)/2, cx=size/2, circumference=2*Math.PI*r;
+  const dash = (pct/100)*circumference;
+  return `<svg width="${size}" height="${size}" style="transform:rotate(-90deg)">
+    <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="#1e293b" stroke-width="8"/>
+    <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-dasharray="${dash} ${circumference}" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function renderBarChart(data) {
+  if (!data || !data.length) return '<div class="empty">No data yet</div>';
+  const maxVal = Math.max(...data.map(d=>Math.max(d.intake||0, d.burned||0)), 1);
+  return `<div style="display:flex;gap:4px;align-items:flex-end;height:80px">
+    ${data.map(d=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%">
+      <div style="flex:1;width:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:2px">
+        <div style="background:#3b82f666;border-radius:3px 3px 0 0;height:${Math.max(3,Math.round((d.intake/maxVal)*60))}px;width:100%"></div>
+        <div style="background:#10b98166;border-radius:3px 3px 0 0;height:${Math.max(2,Math.round((d.burned/maxVal)*60))}px;width:100%"></div>
+      </div>
+      <span style="font-size:9px;color:#64748b">${d.day}</span>
+    </div>`).join("")}
+  </div>
+  <div style="display:flex;gap:16px;margin-top:8px">
+    <span style="font-size:11px;color:#3b82f6">■ Intake</span>
+    <span style="font-size:11px;color:#10b981">■ Burned</span>
+  </div>`;
+}
+
+function renderWeightChart(data) {
+  if (!data || data.length < 2) return '<div class="empty" style="padding:20px">Log weight entries to see chart</div>';
+  const vals = data.map(d=>d.weight);
+  const min = Math.min(...vals)-1, max = Math.max(...vals)+1, range = max-min;
+  const W=300, H=80, n=data.length;
+  const pts = data.map((d,i)=>({x:i*(W/(n-1)), y:H-((d.weight-min)/range)*H}));
+  const path = pts.map((p,i)=>`${i===0?"M":"L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+  return `<svg viewBox="0 0 300 80" style="width:100%;height:80px">
+    <path d="${path}" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/>
+    ${pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="#a855f7"/>`).join("")}
+  </svg>
+  <div style="display:flex;justify-content:space-between;font-size:10px;color:#64748b;margin-top:2px">
+    <span>${data[0].date}</span><span>${data[data.length-1].date}</span>
+  </div>`;
+}
+
+// ─── Workout Screen ───────────────────────────────────────────────────────────
+function renderWorkout(derived) {
+  const { todayWorkouts } = derived;
+  const tab = UI.workoutTab;
+  const search = UI.workoutSearch;
+  const suggested = EXERCISE_DB[APP.profile.goal] || EXERCISE_DB["Maintenance"];
+  const allEx = Object.values(EXERCISE_DB).flat();
+  const filtered = search.trim() ? allEx.filter(e=>e.name.toLowerCase().includes(search.toLowerCase())||e.type.toLowerCase().includes(search.toLowerCase())) : [];
+
+  return `<div class="screen">
+    <div class="screen-head"><h2 class="screen-title">🏋️ Workout Tracker</h2>
+      <button class="add-btn" onclick="openWorkoutModal()">+ Log</button></div>
+
+    <div style="position:relative;margin-bottom:14px">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
+      <input id="workout-search" class="input-field" style="padding-left:40px" placeholder="Search exercises…" value="${e(search)}" oninput="UI.workoutSearch=this.value;render()"/>
+      ${search?`<button onclick="UI.workoutSearch='';render()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#64748b;cursor:pointer;font-size:18px">✕</button>`:""}
+    </div>
+
+    ${search.trim() ? `
+      <p class="note">${filtered.length} result(s) for "${e(search)}"</p>
+      ${filtered.length===0?'<div class="empty">No exercises found.</div>':filtered.map(ex=>renderExRow(ex)).join("")}
+    ` : `
+      <div class="tabs-row">
+        ${["today","suggested","favorites","history"].map(t=>`<button class="tab-btn${tab===t?" active":""}" onclick="UI.workoutTab='${t}';render()">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join("")}
+      </div>
+
+      ${tab==="today" ? `
+        ${todayWorkouts.length===0?'<div class="empty">No workouts logged today. Let\'s move! 💪</div>':''}
+        ${todayWorkouts.map(w=>renderWorkoutCard(w)).join("")}
+        ${todayWorkouts.length>0?`<div class="summary-box">Total burned: <b style="color:#10b981">${sumField(todayWorkouts,"calories")} cal</b></div>`:""}
+      ` : ""}
+
+      ${tab==="suggested" ? `
+        <p class="note">Based on goal: <b style="color:#3b82f6">${APP.profile.goal}</b></p>
+        ${suggested.map(ex=>renderExRow(ex)).join("")}
+      ` : ""}
+
+      ${tab==="favorites" ? `
+        ${APP.favWorkouts.length===0?'<div class="empty">No favourite exercises yet. Tap ⭐ on any exercise to save it here.</div>':''}
+        ${APP.favWorkouts.map(ex=>renderExRow(ex)).join("")}
+      ` : ""}
+
+      ${tab==="history" ? `
+        ${APP.workouts.length===0?'<div class="empty">No workout history yet.</div>':''}
+        ${[...new Set(APP.workouts.map(w=>w.date))].reverse().slice(0,14).map(date=>`
+          <div style="font-size:12px;color:#3b82f6;font-weight:600;padding:8px 0 4px">${formatDate(date,{weekday:"short",month:"short",day:"numeric"})}</div>
+          ${APP.workouts.filter(w=>w.date===date).map(w=>renderWorkoutCard(w)).join("")}
+        `).join("")}
+      ` : ""}
+    `}
+  </div>`;
+}
+
+function renderWorkoutCard(w) {
+  const isFav = APP.favWorkouts.some(f=>f.name===w.name);
+  const meta = [w.sets?`${w.sets} sets`:"", w.reps?`${w.reps} reps`:"", w.duration?`${w.duration}min`:""].filter(Boolean).join(" · ");
+  return `<div class="row" style="flex-wrap:wrap;gap:6px">
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e(w.name)}</div>
+      <div style="font-size:12px;color:#64748b">${e(w.type)} ${meta?'· '+meta:""} · 🔥${w.calories} cal</div>
+    </div>
+    <div style="display:flex;gap:4px;align-items:center">
+      <button onclick="dispatch('toggleFavWorkout',${JSON.stringify(w)})" style="background:transparent;border:none;cursor:pointer;font-size:18px">${isFav?"⭐":"☆"}</button>
+      <button onclick="openWorkoutEditModal(${JSON.stringify(w)})" style="background:#1e3a5f;border:1px solid #3b82f6;border-radius:8px;padding:4px 10px;color:#3b82f6;cursor:pointer;font-size:12px">Edit</button>
+      <button class="remove-btn" onclick="UI.workoutDeleteId=${w.id};render()">🗑</button>
+    </div>
+  </div>`;
+}
+
+function renderExRow(ex) {
+  const isFav = APP.favWorkouts.some(f=>f.name===ex.name);
+  const meta = [ex.sets?`${ex.sets}×`:null, ex.reps?`${ex.reps} reps`:null, ex.duration?`${ex.duration}min`:null].filter(Boolean).join(" ");
+  return `<div class="row">
+    <div style="flex:1">
+      <div style="font-weight:600;font-size:14px">${e(ex.name)}</div>
+      <div style="font-size:12px;color:#64748b">${e(ex.type)} ${meta?'· '+meta:""} · 🔥${ex.calories} cal</div>
+    </div>
+    <div style="display:flex;gap:4px;align-items:center">
+      <button onclick="dispatch('toggleFavWorkout',${JSON.stringify(ex)})" style="background:transparent;border:none;cursor:pointer;font-size:18px">${isFav?"⭐":"☆"}</button>
+      <button class="add-small" onclick="dispatch('addWorkout',${JSON.stringify(ex)});UI.workoutTab='today';render()">+ Add</button>
+    </div>
+  </div>`;
+}
+
+// ─── Nutrition Screen ─────────────────────────────────────────────────────────
+function renderNutrition(derived) {
+  const { todayMeals } = derived;
+  const tab = UI.nutritionTab;
+  const search = UI.nutritionSearch;
+  const calIn = sumField(todayMeals,"calories");
+  const protein = sumField(todayMeals,"protein");
+  const carbs = sumField(todayMeals,"carbs");
+  const fat = sumField(todayMeals,"fat");
+  const filtered = search.trim() ? COMMON_FOODS.filter(f=>f.name.toLowerCase().includes(search.toLowerCase())) : COMMON_FOODS;
+
+  return `<div class="screen">
+    <div class="screen-head"><h2 class="screen-title">🍎 Nutrition</h2>
+      <button class="add-btn" onclick="openNutritionModal()">+ Log</button></div>
+
+    <div class="card">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+        ${[["Calories",calIn,APP.profile.targetCalories||2000,"kcal","#f59e0b"],["Protein",protein,150,"g","#3b82f6"],["Carbs",carbs,250,"g","#a855f7"],["Fat",fat,65,"g","#ef4444"]].map(([l,v,t,u,c])=>`
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+            <span style="color:${c};font-weight:700;font-size:18px">${v}</span>
+            <span style="color:#64748b;font-size:11px">${u}</span>
+            <div class="progress-bar" style="width:100%"><div class="progress-fill" style="width:${Math.min(100,Math.round(v/t*100))}%;background:${c}"></div></div>
+            <span style="font-size:9px;color:#64748b">${l}</span>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <div style="position:relative;margin-bottom:14px">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none">🔍</span>
+      <input class="input-field" style="padding-left:40px" placeholder="Search foods…" value="${e(search)}" oninput="UI.nutritionSearch=this.value;render()"/>
+      ${search?`<button onclick="UI.nutritionSearch='';render()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#64748b;cursor:pointer;font-size:18px">✕</button>`:""}
+    </div>
+
+    ${search.trim() ? `
+      <p class="note">${filtered.length} food(s) found</p>
+      ${filtered.length===0?'<div class="empty">No foods found. Log manually.</div>':filtered.map(f=>renderFoodRow(f)).join("")}
+    ` : `
+      <div class="tabs-row">
+        ${[...MEAL_TYPES,"favorites"].map(t=>`<button class="tab-btn${tab===t?" active":""}" onclick="UI.nutritionTab='${t}';render()">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join("")}
+      </div>
+
+      ${MEAL_TYPES.includes(tab) ? `
+        ${todayMeals.filter(m=>m.meal===tab).length===0?`<div class="empty">No ${tab.toLowerCase()} logged yet.</div>`:""}
+        ${todayMeals.filter(m=>m.meal===tab).map(m=>renderMealCard(m)).join("")}
+        <p class="note" style="margin-top:16px">Quick Add Foods:</p>
+        ${COMMON_FOODS.map(f=>renderFoodRow(f)).join("")}
+      ` : ""}
+
+      ${tab==="favorites" ? `
+        ${APP.favMeals.length===0?'<div class="empty">No favourite foods yet. Tap ⭐ on any food to save it here.</div>':''}
+        ${APP.favMeals.map(f=>renderFoodRow(f)).join("")}
+      ` : ""}
+    `}
+  </div>`;
+}
+
+function renderMealCard(m) {
+  const isFav = APP.favMeals.some(f=>f.name===m.name);
+  return `<div class="row">
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:600;font-size:14px">${e(m.name)}</div>
+      <div style="font-size:12px;color:#64748b">${m.calories} kcal · P${m.protein}g C${m.carbs}g F${m.fat}g</div>
+    </div>
+    <div style="display:flex;gap:4px;align-items:center">
+      <button onclick="dispatch('toggleFavMeal',${JSON.stringify(m)})" style="background:transparent;border:none;cursor:pointer;font-size:18px">${isFav?"⭐":"☆"}</button>
+      <button onclick="openNutritionEditModal(${JSON.stringify(m)})" style="background:#1e3a5f;border:1px solid #3b82f6;border-radius:8px;padding:4px 10px;color:#3b82f6;cursor:pointer;font-size:12px">Edit</button>
+      <button class="remove-btn" onclick="UI.nutritionDeleteId=${m.id};render()">🗑</button>
+    </div>
+  </div>`;
+}
+
+function renderFoodRow(f) {
+  const isFav = APP.favMeals.some(x=>x.name===f.name);
+  return `<div class="row">
+    <div style="flex:1">
+      <div style="font-weight:600;font-size:14px">${e(f.name)}</div>
+      <div style="font-size:12px;color:#64748b">${f.calories} kcal · P${f.protein}g C${f.carbs}g F${f.fat}g</div>
+    </div>
+    <div style="display:flex;gap:4px;align-items:center">
+      <button onclick="dispatch('toggleFavMeal',${JSON.stringify(f)})" style="background:transparent;border:none;cursor:pointer;font-size:18px">${isFav?"⭐":"☆"}</button>
+      <button class="add-small" onclick="dispatch('addMeal',{...${JSON.stringify(f)},meal:'${UI.nutritionTab==="favorites"?"Breakfast":UI.nutritionTab}'})" >+ Add</button>
+    </div>
+  </div>`;
+}
+
+// ─── Weight Screen ─────────────────────────────────────────────────────────────
+function renderWeight(derived) {
+  const { latestWeight, bmi, bmiLabel, weightChartData } = derived;
+  const startWeight = APP.weights.length ? APP.weights[0].weight : APP.profile.weight;
+  const change = (latestWeight - startWeight).toFixed(1);
+  const toGoal = (latestWeight - (APP.profile.targetWeight || latestWeight)).toFixed(1);
+
+  return `<div class="screen">
+    <div class="screen-head"><h2 class="screen-title">⚖️ Weight Tracker</h2>
+      <button class="add-btn" onclick="openWeightModal()">+ Log</button></div>
+
+    <div class="grid4">
+      ${[["Current",`${latestWeight}kg`,"#3b82f6"],["Change",`${+change>0?"+":""}${change}kg`,+change<=0?"#10b981":"#ef4444"],["To Goal",`${toGoal}kg`,"#f59e0b"],["BMI",bmi,"#a855f7"]].map(([l,v,c])=>`
+        <div class="stat-card"><span style="font-size:20px;font-weight:700;color:${c}">${v}</span><span style="font-size:10px;color:#64748b">${l}</span></div>
+      `).join("")}
+    </div>
+
+    <div class="card">
+      <div class="card-head">BMI Scale <span style="color:#3b82f6;font-size:12px">${bmi} — ${bmiLabel}</span></div>
+      <div style="display:flex;gap:3px;margin-bottom:6px">
+        ${[["#3b82f6"],["#10b981"],["#f59e0b"],["#ef4444"]].map(([c])=>`<div style="flex:1;height:8px;background:${c};border-radius:4px"></div>`).join("")}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#64748b">
+        <span>Under</span><span>Normal</span><span>Over</span><span>Obese</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">📈 Weight Trend (last 14 days)</div>
+      ${renderWeightChart(weightChartData)}
+    </div>
+
+    <div class="card">
+      <div class="card-head">History</div>
+      ${APP.weights.length===0?'<div class="empty">No weight entries yet.</div>':''}
+      ${[...APP.weights].reverse().slice(0,14).map(w=>`
+        <div class="row">
+          <div><div style="font-weight:600">${w.weight} kg</div><div style="font-size:12px;color:#64748b">${formatDate(w.date,{weekday:"short",month:"short",day:"numeric"})}</div></div>
+          <div style="display:flex;gap:4px">
+            <button onclick="openWeightEditModal('${w.date}',${w.weight})" style="background:#1e3a5f;border:1px solid #3b82f6;border-radius:8px;padding:4px 10px;color:#3b82f6;cursor:pointer;font-size:12px">Edit</button>
+            <button class="remove-btn" onclick="UI.weightDeleteDate='${w.date}';render()">🗑</button>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  </div>`;
+}
+
+// ─── Body Analysis Screen ──────────────────────────────────────────────────────
+function renderBody() {
+  const step = UI.bodyStep;
+  const bodyTypes = [{id:"lean",label:"Lean",desc:"Visible muscle, low fat",icon:"💪"},{id:"average",label:"Average",desc:"Moderate build",icon:"🏃"},{id:"overweight",label:"Overweight",desc:"Higher body fat",icon:"🎯"}];
+  const areaList = [{id:"belly",icon:"🫃",label:"Belly / Core"},{id:"arms",icon:"💪",label:"Arms"},{id:"chest",icon:"🫁",label:"Chest"},{id:"legs",icon:"🦵",label:"Legs"}];
+
+  if (step===0) return `<div class="screen">
+    <h2 class="screen-title" style="margin-bottom:8px">🧬 Body Analysis</h2>
+    <p class="note">AI-powered personalized analysis based on your body type and problem areas.</p>
+    <p style="font-size:13px;color:#94a3b8;margin-bottom:16px">Step 1: Select your body type</p>
+    ${bodyTypes.map(bt=>`<div onclick="UI.bodyType='${bt.id}';UI.bodyStep=1;render()" style="background:${UI.bodyType===bt.id?"#1e3a5f":"#0f172a"};border:1px solid ${UI.bodyType===bt.id?"#3b82f6":"#1e293b"};border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px">
+      <span style="font-size:32px">${bt.icon}</span>
+      <div><div style="font-weight:700;font-size:16px">${bt.label}</div><div style="font-size:13px;color:#64748b">${bt.desc}</div></div>
+    </div>`).join("")}
+  </div>`;
+
+  if (step===1) return `<div class="screen">
+    <button class="back-btn" onclick="UI.bodyStep=0;render()" style="margin-bottom:14px">← Back</button>
+    <h2 class="screen-title" style="margin-bottom:8px">Select Problem Areas</h2>
+    <p class="note">Step 2: Choose areas to focus on (select multiple)</p>
+    ${areaList.map(a=>{const sel=UI.bodyAreas.includes(a.id);return`<div onclick="toggleBodyArea('${a.id}')" style="background:${sel?"#1e3a5f":"#0f172a"};border:1px solid ${sel?"#3b82f6":"#1e293b"};border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px">
+      <span style="font-size:32px">${a.icon}</span>
+      <div style="flex:1"><div style="font-weight:700;font-size:16px">${a.label}</div></div>
+      ${sel?`<span style="color:#3b82f6;font-size:20px">✓</span>`:""}
+    </div>`}).join("")}
+    ${UI.bodyAreas.length>0?`<button class="grad-btn" onclick="runBodyAnalysis()">🧬 Analyse My Body</button>`:""}
+  </div>`;
+
+  if (step===2 && UI.bodyResult) {
+    const r = UI.bodyResult;
+    const scoreColor = r.score>=70?"#10b981":r.score>=50?"#f59e0b":"#ef4444";
+    return `<div class="screen">
+      <button class="back-btn" onclick="UI.bodyStep=0;UI.bodyAreas=[];UI.bodyResult=null;render()" style="margin-bottom:14px">🔄 New Analysis</button>
+      <div class="card" style="text-align:center;padding:24px">
+        <div style="font-size:48px;font-weight:800;color:${scoreColor}">${r.score}</div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:4px">Fitness Score / 100</div>
+        <div style="font-size:14px;color:#94a3b8;margin-bottom:8px">Body type: <b style="color:#f1f5f9">${r.bodyType.charAt(0).toUpperCase()+r.bodyType.slice(1)}</b></div>
+        <div style="font-size:11px;color:#64748b">ID: ${r.analysisId}</div>
+      </div>
+      <div class="card">
+        <div class="card-head">⚠️ Problem Areas Detected</div>
+        ${r.problems.map(p=>`<div style="background:#0a0f1e;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px;color:#94a3b8">• ${e(p)}</div>`).join("")}
+      </div>
+      <div class="card">
+        <div class="card-head">🏋️ Recommended Exercises</div>
+        ${r.exercises.map((ex,i)=>`<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;background:#0a0f1e;border-radius:10px;padding:10px 12px">
+          <div style="width:24px;height:24px;border-radius:12px;background:#3b82f622;border:1px solid #3b82f644;color:#3b82f6;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+          <span style="font-size:13px">${e(ex)}</span>
+        </div>`).join("")}
+      </div>
+      <div class="card">
+        <div class="card-head">🥗 Nutrition Strategy</div>
+        ${r.diet.map(d=>`<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+          <div style="width:20px;height:20px;border-radius:10px;background:#0a1f10;border:1px solid #166534;display:flex;align-items:center;justify-content:center;font-size:11px;color:#4ade80;flex-shrink:0">✓</div>
+          <span style="font-size:13px;color:#94a3b8;line-height:1.6">${e(d)}</span>
+        </div>`).join("")}
+      </div>
+      <div class="card">
+        <div class="card-head">📅 Weekly Training Plan</div>
+        ${r.plan.map(p=>`<div style="display:flex;gap:12px;margin-bottom:10px;background:#0a0f1e;border-radius:10px;padding:10px 12px;align-items:flex-start">
+          <div style="flex-shrink:0;background:linear-gradient(90deg,#3b82f6,#a855f7);border-radius:8px;padding:5px 8px;font-size:10px;font-weight:800;min-width:36px;text-align:center">${p.day}</div>
+          <div><div style="font-size:13px;font-weight:700">${p.focus}</div><div style="font-size:12px;color:#64748b">${e(p.exercises)}</div></div>
+        </div>`).join("")}
+      </div>
+      <div style="background:#0f1f14;border:1px solid #1a3a28;border-radius:12px;padding:12px;margin-bottom:14px;font-size:11px;color:#64748b;line-height:1.6">
+        ℹ️ This is a simulated analysis based on your selections. Results are not a medical assessment. Consult a certified fitness professional before beginning any new programme.
+      </div>
+    </div>`;
+  }
+  return "";
+}
+
+// ─── Reminders Screen ─────────────────────────────────────────────────────────
+function renderReminders() {
+  const r = APP.reminders;
+  return `<div class="screen">
+    <div class="screen-head"><h2 class="screen-title">🔔 Reminders</h2>
+      <button class="add-btn" onclick="openReminderModal()">+ Add</button></div>
+    <p class="note">These are visual reminders shown in the app. Browser notifications require permission.</p>
+    ${r.map(rem=>`<div class="card" style="margin-bottom:10px;padding:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:28px">${rem.icon}</span>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:15px">${e(rem.label)}</div>
+          <div style="font-size:12px;color:#64748b">${rem.time} · ${rem.days.join(", ")}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div onclick="dispatch('toggleReminder',${rem.id})" style="width:44px;height:24px;border-radius:12px;background:${rem.enabled?"#3b82f6":"#1e293b"};cursor:pointer;position:relative;transition:background .2s">
+            <div style="width:20px;height:20px;border-radius:10px;background:#fff;position:absolute;top:2px;${rem.enabled?"right:2px":"left:2px"};transition:all .2s"></div>
+          </div>
+          <button class="remove-btn" onclick="dispatch('removeReminder',${rem.id})">🗑</button>
+        </div>
+      </div>
+    </div>`).join("")}
+    ${r.length===0?'<div class="empty">No reminders set.</div>':""}
+  </div>`;
+}
+
+// ─── AI Coach Screen ───────────────────────────────────────────────────────────
+function renderAI(derived) {
+  const analysis = runRuleEngine({ profile:APP.profile, derived, workouts:APP.workouts, meals:APP.meals, weights:APP.weights });
+  const scoreColor = analysis.score>=80?"#10b981":analysis.score>=60?"#3b82f6":analysis.score>=40?"#f59e0b":"#ef4444";
+  const tab = UI.aiTab;
+
+  const sevColors = {critical:{dot:"#ef4444",bg:"#1a0a0a",border:"#3f1111",label:"Critical"},warning:{dot:"#f59e0b",bg:"#1a1000",border:"#3f2800",label:"Warning"},info:{dot:"#3b82f6",bg:"#0a1628",border:"#1e3a5f",label:"Info"}};
+
+  return `<div class="screen">
+    <h2 class="screen-title" style="margin-bottom:4px">🤖 AI Fitness Coach</h2>
+    <p class="note">Rule-based analysis — no API required</p>
+
+    <div class="card" style="background:linear-gradient(135deg,#0f172a,#0a1628)">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+        <div style="position:relative;width:80px;height:80px;flex-shrink:0">
+          ${renderRing(analysis.score, scoreColor, 80)}
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:20px;font-weight:800;color:${scoreColor}">${analysis.score}</div>
+            <div style="font-size:9px;color:#64748b">/100</div>
+          </div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:18px;font-weight:700;margin-bottom:4px">${analysis.scoreLabel}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${analysis.issues.some(i=>i.severity==="critical")?`<span class="tag" style="background:#3f1111;color:#ef4444">⚠️ ${analysis.issues.filter(i=>i.severity==="critical").length} Critical</span>`:""}
+            ${analysis.issues.some(i=>i.severity==="warning")?`<span class="tag" style="background:#3f2800;color:#fcd34d">${analysis.issues.filter(i=>i.severity==="warning").length} Warning</span>`:""}
+            ${!analysis.issues.length?`<span class="tag" style="background:#14532d;color:#86efac">All Clear</span>`:""}
+          </div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#94a3b8;line-height:1.6;border-top:1px solid #1e293b;padding-top:12px">${analysis.summary}</div>
+    </div>
+
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      ${[["issues",`⚠️ Issues (${analysis.issues.length})`],["recommendations",`💡 Advice`],["nextSteps","✅ Steps"],["plan","📅 Plan"]].map(([id,lbl])=>`<button class="tab-btn${tab===id?" active":""}" onclick="UI.aiTab='${id}';render()">${lbl}</button>`).join("")}
+    </div>
+
+    ${tab==="issues" ? `
+      ${analysis.issues.length===0?`<div class="card" style="text-align:center;padding:30px"><div style="font-size:40px;margin-bottom:8px">✅</div><div style="font-size:16px;font-weight:700;color:#10b981">No Issues Detected</div><div style="font-size:13px;color:#64748b">Your habits are well-aligned with your ${APP.profile.goal} goal.</div></div>`:""}
+      ${analysis.issues.map(issue=>{const s=sevColors[issue.severity]||sevColors.info;return`<div style="background:${s.bg};border:1px solid ${s.border};border-radius:14px;padding:16px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div style="width:10px;height:10px;border-radius:5px;background:${s.dot};flex-shrink:0;box-shadow:0 0 6px ${s.dot}"></div>
+          <span style="flex:1;font-size:14px;font-weight:700">${e(issue.title)}</span>
+          <span style="background:${s.dot}22;border:1px solid ${s.dot}55;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;color:${s.dot}">${s.label}</span>
+        </div>
+        <div style="font-size:13px;color:#94a3b8;line-height:1.6;padding-left:20px">${e(issue.detail)}</div>
+      </div>`;}).join("")}
+    ` : ""}
+
+    ${tab==="recommendations" ? `
+      ${analysis.recommendations.length===0?`<div class="card"><div class="empty">Log more data to unlock recommendations.</div></div>`:""}
+      ${analysis.recommendations.map(rec=>`<div class="card" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:24px">${rec.icon}</span>
+          <div style="flex:1"><div style="font-size:14px;font-weight:700">${e(rec.title)}</div><div style="font-size:11px;color:#3b82f6;font-weight:600">${rec.category}</div></div>
+        </div>
+        <div style="font-size:13px;color:#94a3b8;line-height:1.6;margin-bottom:${rec.foods||rec.plan?12:0}px">${e(rec.detail)}</div>
+        ${rec.foods?rec.foods.map(f=>`<div style="display:flex;align-items:center;gap:8px;background:#0a0f1e;border-radius:8px;padding:8px 10px;margin-bottom:4px"><span style="color:#3b82f6;font-size:12px;font-weight:700">→</span><span style="font-size:12px;color:#94a3b8">${e(f)}</span></div>`).join(""):""}
+        ${rec.plan?rec.plan.map(p=>`<div style="display:flex;gap:10px;margin-bottom:6px;background:#0a0f1e;border-radius:10px;padding:10px 12px;align-items:flex-start">
+          <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(90deg,#3b82f6,#a855f7);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">${e(p.day)}</div>
+          <div><div style="font-size:13px;font-weight:700">${e(p.focus)}</div><div style="font-size:11px;color:#64748b">${e(p.exercises)}</div></div>
+        </div>`).join(""):""}
+      </div>`).join("")}
+    ` : ""}
+
+    ${tab==="nextSteps" ? `
+      ${analysis.nextSteps.length===0?`<div class="card"><div class="empty" style="color:#10b981">You're doing everything right! 🎉</div></div>`:""}
+      ${analysis.nextSteps.map((step,i)=>`<div style="background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start">
+        <div style="width:28px;height:28px;border-radius:14px;background:linear-gradient(90deg,#3b82f6,#a855f7);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">${i+1}</div>
+        <div style="flex:1">
+          <div style="font-size:10px;color:#3b82f6;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">${step.priority===1?"Do Today":step.priority===2?"Do This Week":"When Possible"}</div>
+          <div style="font-size:13px;color:#f1f5f9;line-height:1.6">${e(step.action)}</div>
+        </div>
+      </div>`).join("")}
+    ` : ""}
+
+    ${tab==="plan" ? `
+      <p class="note">Recommended plan: <b style="color:#3b82f6">${APP.profile.goal}</b></p>
+      ${analysis.weeklyPlan.map(p=>`<div style="display:flex;gap:12px;margin-bottom:10px;background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:12px 14px;align-items:flex-start">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(90deg,#3b82f6,#a855f7);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${p.day}</div>
+        <div><div style="font-size:14px;font-weight:700;margin-bottom:2px">${p.focus}</div><div style="font-size:12px;color:#64748b;line-height:1.5">${e(p.exercises)}</div></div>
+      </div>`).join("")}
+      <div style="background:#0a1628;border:1px solid #1e293b;border-radius:12px;padding:12px;margin-top:4px;font-size:11px;color:#64748b;line-height:1.6">
+        💡 <b style="color:#94a3b8">Rest days:</b> Sleep 7–9 hours. Active recovery on off days accelerates muscle repair.
+      </div>
+    ` : ""}
+  </div>`;
+}
+
+// ─── Profile Screen ────────────────────────────────────────────────────────────
+function renderProfile() {
+  const p = UI.profileForm || APP.profile;
+  const isEditing = !!UI.profileForm;
+  return `<div class="screen">
+    <div class="screen-head"><h2 class="screen-title">👤 Profile</h2>
+      ${!isEditing?`<button class="add-btn" onclick="openProfileEdit()">Edit</button>`:""}
+    </div>
+
+    ${isEditing ? `
+      <div class="card">
+        ${[["Name","name","text"],["Email","email","email"],["Age","age","number"],["Weight (kg)","weight","number"],["Height (cm)","height","number"],["Target Weight","targetWeight","number"],["Target Calories","targetCalories","number"],["Target Workouts/week","targetWorkouts","number"]].map(([lbl,fld,type])=>`
+          <div class="form-group">
+            <label class="label">${lbl}</label>
+            <input class="input-field" type="${type}" value="${e(p[fld])}" onchange="UI.profileForm={...UI.profileForm,${fld}:this.value}"/>
+          </div>
+        `).join("")}
+        <div class="form-group">
+          <label class="label">Fitness Goal</label>
+          <select class="input-field" onchange="UI.profileForm={...UI.profileForm,goal:this.value}">
+            ${FITNESS_GOALS.map(g=>`<option${p.goal===g?" selected":""}>${g}</option>`).join("")}
+          </select>
+        </div>
+        <button class="grad-btn" onclick="saveProfile()">Save Changes</button>
+        <button class="back-btn" onclick="UI.profileForm=null;render()" style="margin-top:8px;width:100%;text-align:center">Cancel</button>
+      </div>
+    ` : `
+      <div class="card" style="text-align:center;padding:24px">
+        <div style="width:60px;height:60px;border-radius:30px;background:linear-gradient(90deg,#3b82f6,#a855f7);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin:0 auto 12px">${(APP.profile.name?.[0]||"A").toUpperCase()}</div>
+        <div style="font-size:20px;font-weight:700">${e(APP.profile.name)}</div>
+        <div style="font-size:13px;color:#64748b">${e(APP.profile.email)}</div>
+      </div>
+      <div class="card">
+        ${[["Age",APP.profile.age+" yrs"],["Weight",APP.profile.weight+" kg"],["Height",APP.profile.height+" cm"],["Goal",APP.profile.goal],["Target Weight",APP.profile.targetWeight+" kg"],["Target Calories",APP.profile.targetCalories+" kcal"],["Target Workouts",(APP.profile.targetWorkouts||4)+"/week"]].map(([l,v])=>`
+          <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1e293b">
+            <span style="color:#64748b;font-size:14px">${l}</span>
+            <span style="font-weight:600;font-size:14px">${e(v)}</span>
+          </div>
+        `).join("")}
+      </div>
+      <button onclick="dispatch('logout')" style="width:100%;background:#1a0a0a;border:1px solid #3f1111;border-radius:12px;padding:14px;color:#ef4444;font-weight:700;font-size:16px;cursor:pointer;margin-top:4px">🚪 Logout</button>
+    `}
+  </div>`;
+}
+
+// ─── Auth Screen ───────────────────────────────────────────────────────────────
+function renderAuth() {
+  const mode = UI.authMode;
+  return `<div style="background:linear-gradient(135deg,#0a0f1e,#0f172a,#0a1628);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:24px;padding:32px;width:100%;max-width:380px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:32px">⚡</span>
+        <span style="font-size:28px;font-weight:800" class="grad-text">FitTrack</span>
+      </div>
+      <p style="color:#64748b;font-size:14px;margin-bottom:24px">Your AI-powered fitness companion</p>
+      <div style="display:flex;background:#1e293b;border-radius:10px;padding:4px;margin-bottom:20px">
+        ${["login","signup"].map(m=>`<button onclick="UI.authMode='${m}';renderAuth_update()" style="flex:1;padding:8px;border:none;border-radius:8px;cursor:pointer;font-size:14px;background:${mode===m?"#3b82f6":"transparent"};color:${mode===m?"#fff":"#64748b"};font-weight:${mode===m?600:400}">${m==="login"?"Login":"Sign Up"}</button>`).join("")}
+      </div>
+      ${mode==="signup"?`<input id="auth-name" placeholder="Full Name" value="${e(UI.authForm.name)}" class="input-field" style="margin-bottom:12px" oninput="UI.authForm.name=this.value"/>`:``}
+      <input id="auth-email" placeholder="Email" value="${e(UI.authForm.email)}" class="input-field" style="margin-bottom:12px" oninput="UI.authForm.email=this.value"/>
+      <input id="auth-pass" placeholder="Password" type="password" value="${e(UI.authForm.password)}" class="input-field" style="margin-bottom:16px" oninput="UI.authForm.password=this.value"/>
+      <button class="grad-btn" onclick="doLogin()">${mode==="login"?"Login":"Create Account"}</button>
+      <p style="color:#64748b;font-size:13px;text-align:center;margin-top:16px">
+        ${mode==="login"?"New here? ":"Already have an account? "}
+        <span onclick="UI.authMode=UI.authMode==='login'?'signup':'login';renderAuth_update()" style="color:#3b82f6;cursor:pointer">${mode==="login"?"Sign Up":"Login"}</span>
+      </p>
+    </div>
+  </div>`;
+}
+
+// ─── Modals ───────────────────────────────────────────────────────────────────
+function renderModals(derived) {
+  let html = "";
+
+  // Workout modal
+  if (UI.workoutModal) {
+    const f = UI.workoutForm;
+    html += `<div class="overlay" onclick="closeIfBg(event,'workoutModal')">
+      <div class="modal">
+        <div class="modal-head"><h3 style="margin:0;font-size:18px;font-weight:700">${UI.workoutEditId?"Edit":"Log"} Workout</h3><button class="close-btn" onclick="UI.workoutModal=false;render()">✕</button></div>
+        ${[["Exercise Name","name","text","e.g. Push-ups"],["Type","type","text","e.g. Cardio"],["Sets","sets","number",""],["Reps","reps","number",""],["Duration (min)","duration","number",""],["Calories Burned","calories","number",""]].map(([l,k,t,ph])=>`
+          <div class="form-group"><label class="label">${l}</label><input class="input-field" type="${t}" value="${e(f[k])}" placeholder="${ph}" oninput="UI.workoutForm.${k}=this.value"/></div>
+        `).join("")}
+        <button class="grad-btn" onclick="submitWorkout()">${UI.workoutEditId?"Save Changes":"Log Workout"}</button>
+      </div>
+    </div>`;
+  }
+
+  // Workout delete confirm
+  if (UI.workoutDeleteId) {
+    const w = APP.workouts.find(x=>x.id===UI.workoutDeleteId);
+    html += renderDeleteModal(w?.name||"this workout",()=>`dispatch('removeWorkout',${UI.workoutDeleteId});UI.workoutDeleteId=null;render()`,"UI.workoutDeleteId=null;render()");
+  }
+
+  // Nutrition modal
+  if (UI.nutritionModal) {
+    const f = UI.nutritionForm;
+    html += `<div class="overlay" onclick="closeIfBg(event,'nutritionModal')">
+      <div class="modal">
+        <div class="modal-head"><h3 style="margin:0;font-size:18px;font-weight:700">${UI.nutritionEditId?"Edit":"Log"} Meal</h3><button class="close-btn" onclick="UI.nutritionModal=false;render()">✕</button></div>
+        <div class="form-group"><label class="label">Meal Type</label><select class="input-field" onchange="UI.nutritionForm.meal=this.value">${MEAL_TYPES.map(t=>`<option${f.meal===t?" selected":""}>${t}</option>`).join("")}</select></div>
+        ${[["Food Name","name","text","e.g. Grilled Chicken"],["Calories (kcal)","calories","number",""],["Protein (g)","protein","number",""],["Carbs (g)","carbs","number",""],["Fat (g)","fat","number",""]].map(([l,k,t,ph])=>`
+          <div class="form-group"><label class="label">${l}</label><input class="input-field" type="${t}" value="${e(f[k])}" placeholder="${ph}" oninput="UI.nutritionForm.${k}=this.value"/></div>
+        `).join("")}
+        <button class="grad-btn" onclick="submitNutrition()">${UI.nutritionEditId?"Save Changes":"Log Meal"}</button>
+      </div>
+    </div>`;
+  }
+
+  if (UI.nutritionDeleteId) {
+    const m = APP.meals.find(x=>x.id===UI.nutritionDeleteId);
+    html += renderDeleteModal(m?.name||"this meal",()=>`dispatch('removeMeal',${UI.nutritionDeleteId});UI.nutritionDeleteId=null;render()`,"UI.nutritionDeleteId=null;render()");
+  }
+
+  // Weight modal
+  if (UI.weightModal) {
+    html += `<div class="overlay" onclick="closeIfBg(event,'weightModal')">
+      <div class="modal">
+        <div class="modal-head"><h3 style="margin:0;font-size:18px;font-weight:700">${UI.weightEditDate?"Edit":"Log"} Weight</h3><button class="close-btn" onclick="UI.weightModal=false;render()">✕</button></div>
+        <div class="form-group"><label class="label">Weight (kg)</label><input id="weight-input" class="input-field" type="number" step="0.1" value="${e(UI.weightInput)}" placeholder="e.g. 75.5" oninput="UI.weightInput=this.value"/></div>
+        <button class="grad-btn" onclick="submitWeight()">Save</button>
+      </div>
+    </div>`;
+  }
+
+  if (UI.weightDeleteDate) {
+    html += renderDeleteModal("this weight entry",()=>`dispatch('removeWeight','${UI.weightDeleteDate}');UI.weightDeleteDate=null;render()`,"UI.weightDeleteDate=null;render()");
+  }
+
+  // Reminder modal
+  if (UI.reminderModal) {
+    const f = UI.reminderForm;
+    const allDays = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+    html += `<div class="overlay" onclick="closeIfBg(event,'reminderModal')">
+      <div class="modal">
+        <div class="modal-head"><h3 style="margin:0;font-size:18px;font-weight:700">${UI.reminderEditId?"Edit":"Add"} Reminder</h3><button class="close-btn" onclick="UI.reminderModal=false;render()">✕</button></div>
+        <div class="form-group"><label class="label">Label</label><input class="input-field" value="${e(f.label)}" placeholder="e.g. Morning Workout" oninput="UI.reminderForm.label=this.value"/></div>
+        <div class="form-group"><label class="label">Icon</label><input class="input-field" value="${e(f.icon)}" placeholder="emoji" oninput="UI.reminderForm.icon=this.value"/></div>
+        <div class="form-group"><label class="label">Time</label><input class="input-field" type="time" value="${e(f.time)}" oninput="UI.reminderForm.time=this.value"/></div>
+        <div class="form-group"><label class="label">Days</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${allDays.map(d=>`<button onclick="toggleReminderDay('${d}')" style="padding:6px 10px;border-radius:8px;border:1px solid ${f.days.includes(d)?"#3b82f6":"#334155"};background:${f.days.includes(d)?"#1e3a5f":"#1e293b"};color:${f.days.includes(d)?"#3b82f6":"#64748b"};cursor:pointer;font-size:13px">${d}</button>`).join("")}
+          </div>
+        </div>
+        <button class="grad-btn" onclick="submitReminder()">Save Reminder</button>
+      </div>
+    </div>`;
+  }
+
+  return html;
+}
+
+function renderDeleteModal(name, onConfirmFn, onCancelFn) {
+  return `<div class="overlay">
+    <div class="modal" style="padding:24px">
+      <h3 style="margin:0 0 12px;font-size:18px;font-weight:700">Delete?</h3>
+      <p style="color:#94a3b8;font-size:14px;margin-bottom:20px">Remove <b>${e(name)}</b>? This cannot be undone.</p>
+      <div style="display:flex;gap:8px">
+        <button onclick="${onCancelFn}" style="flex:1;background:#1e293b;border:none;border-radius:10px;padding:12px;color:#94a3b8;cursor:pointer;font-size:14px">Cancel</button>
+        <button onclick="${onConfirmFn}" style="flex:1;background:#3f1111;border:1px solid #ef4444;border-radius:10px;padding:12px;color:#ef4444;cursor:pointer;font-size:14px;font-weight:700">Delete</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── Escape helper ────────────────────────────────────────────────────────────
+function e(str) {
+  return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ─── Modal helpers ─────────────────────────────────────────────────────────────
+function openWorkoutModal() { UI.workoutEditId=null; UI.workoutForm={name:"",type:"",sets:3,reps:10,duration:0,calories:50}; UI.workoutModal=true; render(); }
+function openWorkoutEditModal(w) { UI.workoutEditId=w.id; UI.workoutForm={name:w.name,type:w.type,sets:w.sets||3,reps:w.reps||10,duration:w.duration||0,calories:w.calories||50}; UI.workoutModal=true; render(); }
+function submitWorkout() {
+  const f=UI.workoutForm; if(!f.name) return;
+  const data={...f,sets:+f.sets,reps:+f.reps,duration:+f.duration,calories:+f.calories};
+  if(UI.workoutEditId) dispatch('editWorkout',UI.workoutEditId,data);
+  else dispatch('addWorkout',data);
+  UI.workoutModal=false; UI.workoutTab="today"; render();
+}
+function openNutritionModal() { UI.nutritionEditId=null; UI.nutritionForm={name:"",meal:UI.nutritionTab==="favorites"?"Breakfast":UI.nutritionTab,calories:0,protein:0,carbs:0,fat:0}; UI.nutritionModal=true; render(); }
+function openNutritionEditModal(m) { UI.nutritionEditId=m.id; UI.nutritionForm={name:m.name,meal:m.meal,calories:m.calories,protein:m.protein,carbs:m.carbs,fat:m.fat}; UI.nutritionModal=true; render(); }
+function submitNutrition() {
+  const f=UI.nutritionForm; if(!f.name) return;
+  const data={...f,calories:+f.calories,protein:+f.protein,carbs:+f.carbs,fat:+f.fat};
+  if(UI.nutritionEditId) dispatch('editMeal',UI.nutritionEditId,data);
+  else dispatch('addMeal',data);
+  UI.nutritionModal=false; render();
+}
+function openWeightModal() { UI.weightEditDate=null; UI.weightInput=""; UI.weightModal=true; render(); }
+function openWeightEditModal(date,weight) { UI.weightEditDate=date; UI.weightInput=String(weight); UI.weightModal=true; render(); }
+function submitWeight() {
+  if(!UI.weightInput) return;
+  if(UI.weightEditDate) dispatch('editWeight',UI.weightEditDate,UI.weightInput);
+  else dispatch('addWeight',UI.weightInput);
+  UI.weightModal=false; render();
+}
+function openReminderModal() { UI.reminderEditId=null; UI.reminderForm={label:"",time:"08:00",icon:"🔔",days:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]}; UI.reminderModal=true; render(); }
+function submitReminder() {
+  const f=UI.reminderForm; if(!f.label) return;
+  if(UI.reminderEditId) dispatch('updateReminder',UI.reminderEditId,f);
+  else dispatch('addReminder',f);
+  UI.reminderModal=false; render();
+}
+function toggleReminderDay(d) {
+  const days=UI.reminderForm.days;
+  UI.reminderForm.days = days.includes(d) ? days.filter(x=>x!==d) : [...days,d];
+  render();
+}
+function openProfileEdit() { UI.profileForm={...APP.profile}; render(); }
+function saveProfile() {
+  if(!UI.profileForm) return;
+  const p=UI.profileForm;
+  dispatch('updateProfile',{...p,age:+p.age,weight:+p.weight,height:+p.height,targetWeight:+p.targetWeight,targetCalories:+p.targetCalories,targetWorkouts:+p.targetWorkouts});
+  UI.profileForm=null; render();
+}
+
+function toggleBodyArea(id) { UI.bodyAreas=UI.bodyAreas.includes(id)?UI.bodyAreas.filter(x=>x!==id):[...UI.bodyAreas,id]; render(); }
+function runBodyAnalysis() {
+  if(!UI.bodyType||!UI.bodyAreas.length) return;
+  UI.bodyResult=generateBodyAnalysis({bodyType:UI.bodyType,problemAreas:UI.bodyAreas});
+  UI.bodyStep=2; render();
+}
+
+function addStepsFromInput() {
+  const v=document.getElementById("steps-in")?.value; if(!v) return;
+  dispatch('addSteps',v); render();
+}
+
+function closeIfBg(event, key) {
+  if(event.target===event.currentTarget) { UI[key]=false; render(); }
+}
+
+function renderAuth_update() {
+  document.getElementById("root").innerHTML=renderAuth(); bindAuth();
+}
+
+function bindAuth() {
+  // Auth handled inline via oninput
+}
+
+function doLogin() {
+  const name=document.getElementById("auth-name")?.value||UI.authForm.name||"Athlete";
+  const email=document.getElementById("auth-email")?.value||UI.authForm.email||"";
+  dispatch('login',name,email);
+}
+
+function bindAll(derived) { /* event delegation already used inline */ }
+
+// _nav action
+actions['_nav'] = (screen) => { APP.screen = screen; };
+
+// ─── Bootstrap ────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
